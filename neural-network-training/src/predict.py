@@ -29,4 +29,4 @@ if __name__ == "__main__":
     
     model = load_model(args.model_type)
     result = predict_arm_position(model, args.points, args.model_type)
-    print(f'Prediction: {"Bent" if result == 1 else "Extended"}')
+    print(f'Prediction: {"Согнута" if result == 1 else "Разогнута"}')

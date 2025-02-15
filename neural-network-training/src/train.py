@@ -24,21 +24,21 @@ def train_neural_network(X_train, y_train, X_val, y_val):
     model = NeuralNetwork(input_shape, num_classes)
     model.build_model()
     model.train(X_train, y_train, X_val, y_val)
-    model.save('../models/model_nn.h5')
+    model.save('./models/model_nn.h5')
 
 def train_gradient_boosting(X_train, y_train):
     model = GradientBoostingClassifier()
     model.fit(X_train, y_train)
-    joblib.dump(model, '../models/model_gb.pkl')
+    joblib.dump(model, './models/model_gb.pkl')
 
 def train_svm(X_train, y_train):
     model = SVC(probability=True)
     model.fit(X_train, y_train)
-    joblib.dump(model, '../models/model_svm.pkl')
+    joblib.dump(model, './models/model_svm.pkl')
 
 def main(model_type):
     # Load the dataset
-    X, y = load_data('../data/processed/processed_dataset.csv')
+    X, y = load_data('./data/dataset.csv')
     
     # Split the dataset into training and validation sets
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)

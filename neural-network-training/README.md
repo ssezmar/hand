@@ -1,48 +1,43 @@
-# Neural Network Training for Arm Position Classification
-
-This project aims to train a neural network to classify the positions of the wrist, elbow, and shoulder into two categories: fully extended arms (0) and bent arms (1). The dataset consists of 3D coordinates for these points, and the project includes data processing, model training, and exploratory data analysis.
-
-## Project Structure
+## Структура проекта
 
 ```
 neural-network-training
 ├── data
-│   ├── raw
-│   │   └── dataset.csv          # Raw dataset with 3D positions and labels
-│   └── processed
-│       └── processed_dataset.csv # Processed dataset after normalization
+│   |── dataset.csv          # Основной датасет
+│   └── dataset_evalute.csv  # Тестовый датасет
 ├── models
-│   └── model.py                 # Neural network architecture definition
-├── notebooks
-│   └── data_exploration.ipynb   # Jupyter notebook for data exploration
+│   └── model.py                 # Класс для определения моделей
+│   └── model_nn.h5              # Модель для определения нейросети
+│   └── model_svm.pkl            # Модель svm
+│   └── model_gb.pkl             # Модель градиентного бустинга
 ├── src
-│   ├── train.py                  # Main training script
-│   └── utils.py                  # Utility functions for data handling
-├── requirements.txt              # Python dependencies
+│   ├── train.py                  # Скрипт тренировки моделей
+│   ├── check_dataset.py          # Посмотр данных уже нормализованного датасета
+│   ├── normalizing_dataset.py    # Нормализация и получение датасета через COCO API
+│   ├── predict.py                # Скрипт предсказания с использованием модели
+│   ├── evalute.py                # Скрипт замера точности предсказания на тестовом датасете
+│   └── utils.py                  # Вспомогательный файл
+├── requirements.txt              # Зависимости питона
 └── README.md                     # Project documentation
 ```
 
-## Setup Instructions
+## Установка
 
-1. Clone the repository:
-   ```
-   git clone <repository-url>
-   cd neural-network-training
-   ```
-
-2. Install the required packages:
+1. Установите пакеты:
    ```
    pip install -r requirements.txt
    ```
 
-## Usage
+## Использование
+1. Предсказание
+```
+python .\src\predict.py nn 0.45408869363269133 -0.9841401232552744 -0.39231395677 0.006979895988994844 0.006577035313879653 -0.042247464955013525 -0.8732418494141152 0.854902466133558 0.5978979816695611
+```
+Точки можно задавать через аргументы командной строки
 
-1. **Data Exploration**: Open the `notebooks/data_exploration.ipynb` to explore the dataset and visualize the 3D positions.
-
-2. **Training the Model**: Run the `src/train.py` script to train the neural network on the processed dataset.
-
-3. **Model Definition**: Modify the `models/model.py` file to adjust the neural network architecture as needed.
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for more details.
+Можно использовать несколько модлей 
+```
+nn - нейросеть
+gb - градиентный бустинг
+svm - метод опорных векторов
+```

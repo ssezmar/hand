@@ -34,7 +34,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     model_path = f'./models/model_{args.model_type}.h5' if args.model_type == 'nn' else f'./models/model_{args.model_type}.pkl'
-    test_data_path = './data/raw/dataset.csv'
+    test_data_path = './data/dataset.csv'
     
     model = load_model(args.model_type)
     X_test, y_test = load_data(test_data_path)
