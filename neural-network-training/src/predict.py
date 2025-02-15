@@ -2,6 +2,9 @@ import argparse
 import numpy as np
 import tensorflow as tf
 import joblib
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
 
 def load_model(model_type):
     if model_type == 'nn':
@@ -20,13 +23,25 @@ def predict_arm_position(model, points, model_type):
         prediction = model.predict(points)
         return int(prediction[0])
 
+@app.route('/predict', methods=['POST'])
+def predict():
+    data = request.json
+    model_type = data.get('model_type')
+    points = data.get('points')
+    
+    if not model_type or not points:
+        return jsonify({'error': 'Invalid input'}), 400
+    
+    model = load_model(model_type)
+    result = predict_arm_position(model, points, model_type)
+    response = jsonify({'prediction': 'Согнута' if result == 1 else 'Разогнута'})
+    response.headers['Content-Type'] = 'application/json; charset=utf-8'
+    return response
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Predict arm position (bent or extended) based on 3D coordinates.')
-    parser.add_argument('model_type', choices=['nn', 'gb', 'svm'], help="Type of model to use: 'nn' for neural network, 'gb' for gradient boosting, 'svm' for support vector machine")
-    parser.add_argument('points', metavar='N', type=float, nargs=9,
-                        help='9 float values representing the 3D coordinates of shoulder, elbow, and wrist (x, y, z for each).')
+    parser = argparse.ArgumentParser(description='Start the prediction server.')
+    parser.add_argument('model_type', choices=['nn', 'gb', 'svm'], help="Type of model to load: 'nn' for neural network, 'gb' for gradient boosting, 'svm' for support vector machine")
     args = parser.parse_args()
     
     model = load_model(args.model_type)
-    result = predict_arm_position(model, args.points, args.model_type)
-    print(f'Prediction: {"Согнута" if result == 1 else "Разогнута"}')
+    app.run(host='0.0.0.0', port=5000)

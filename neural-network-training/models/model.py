@@ -17,7 +17,8 @@ class NeuralNetwork:
         self.model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
     def train(self, X_train, y_train, X_val, y_val, epochs=10, batch_size=32):
-        self.model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_val, y_val))
+        history = self.model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_val, y_val))
+        return history
 
     def save(self, file_path):
         self.model.save(file_path)

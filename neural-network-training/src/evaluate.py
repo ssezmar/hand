@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
 import joblib
 import argparse
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def load_data(file_path):
     data = pd.read_csv(file_path)
@@ -25,8 +27,36 @@ def evaluate_model(model, X_test, y_test, model_type):
         y_pred = np.round(y_pred).astype(int).flatten()
     elif model_type == 'gb' or model_type == 'svm':
         y_pred = model.predict(X_test)
+    
     accuracy = accuracy_score(y_test, y_pred)
-    return accuracy
+    precision = precision_score(y_test, y_pred, average='weighted')
+    recall = recall_score(y_test, y_pred, average='weighted')
+    f1 = f1_score(y_test, y_pred, average='weighted')
+    
+    return y_pred, accuracy, precision, recall, f1
+
+def plot_confusion_matrix(y_test, y_pred):
+    cm = confusion_matrix(y_test, y_pred)
+    plt.figure(figsize=(10, 7))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    plt.xlabel('Предсказано')
+    plt.ylabel('Фактически')
+    plt.title('Матрица ошибок')
+    plt.show()
+
+def plot_roc_curve(y_test, y_pred):
+    fpr, tpr, _ = roc_curve(y_test, y_pred)
+    roc_auc = auc(fpr, tpr)
+    plt.figure()
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC кривая (площадь = %0.2f)' % roc_auc)
+    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('Доля ложноположительных')
+    plt.ylabel('Доля истинноположительных')
+    plt.title('Кривая ROC')
+    plt.legend(loc="lower right")
+    plt.show()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Evaluate model accuracy.')
@@ -38,5 +68,12 @@ if __name__ == "__main__":
     
     model = load_model(args.model_type)
     X_test, y_test = load_data(test_data_path)
-    accuracy = evaluate_model(model, X_test, y_test, args.model_type)
-    print(f'Model accuracy: {accuracy * 100:.2f}%')
+    y_pred, accuracy, precision, recall, f1 = evaluate_model(model, X_test, y_test, args.model_type)
+    
+    print(f'Точность модели: {accuracy * 100:.2f}%')
+    print(f'Точность (precision): {precision * 100:.2f}%')
+    print(f'Полнота (recall): {recall * 100:.2f}%')
+    print(f'F1-score: {f1 * 100:.2f}%')
+    
+    plot_confusion_matrix(y_test, y_pred)
+    plot_roc_curve(y_test, y_pred)
